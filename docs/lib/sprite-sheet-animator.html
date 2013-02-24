@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>sprite-sheet-animator.coffee</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>sprite-sheet-animator.coffee</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nx">class</span> <span class="nx">SpriteAnimations</span>
+  <span class="nv">constructor: </span><span class="p">(</span><span class="err">@</span><span class="nx">asset</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="err">@</span><span class="nx">json</span> <span class="o">=</span> <span class="err">@</span><span class="nx">asset</span><span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">)</span>
+    <span class="err">@</span><span class="nx">rollover</span> <span class="o">=</span> <span class="err">@</span><span class="nx">asset</span><span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="s1">&#39;rollover&#39;</span><span class="p">)</span>
+    <span class="err">@</span><span class="nx">autostart</span> <span class="o">=</span> <span class="err">@</span><span class="nx">asset</span><span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="s1">&#39;autostart&#39;</span><span class="p">)</span>
+    <span class="err">@</span><span class="nx">trigger</span> <span class="o">=</span> <span class="err">@</span><span class="nx">asset</span><span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="s1">&#39;trigger&#39;</span><span class="p">)</span>
+    <span class="err">@</span><span class="nx">canvas</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$</span> <span class="s2">&quot;&lt;canvas&gt;&lt;/canvas&gt;&quot;</span><span class="p">).</span><span class="nx">insertBefore</span><span class="p">(</span><span class="err">@</span><span class="nx">asset</span><span class="p">)</span>
+    <span class="err">@</span><span class="nx">asset</span><span class="p">.</span><span class="nx">hide</span><span class="p">()</span>
+
+    <span class="err">@</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="err">@</span><span class="nx">asset</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">))</span>
+    <span class="err">@</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="err">@</span><span class="nx">asset</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">))</span>
+
+    <span class="err">@</span><span class="nx">stage</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Stage</span> <span class="err">@</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span>
+      <span class="nv">url: </span><span class="err">@</span><span class="nx">json</span><span class="p">,</span>
+      <span class="nv">dataType: </span><span class="s1">&#39;json&#39;</span><span class="p">,</span>
+      <span class="nv">success: </span><span class="err">@</span><span class="nx">jsonLoaded</span>
+
+  <span class="nv">jsonLoaded: </span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nx">Ticker</span><span class="p">.</span><span class="nx">addListener</span> <span class="err">@</span><span class="nx">stage</span>
+
+    <span class="err">@</span><span class="nx">spriteSheet</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SpriteSheet</span> <span class="nx">data</span>
+
+    <span class="err">@</span><span class="nx">assetAnimation</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BitmapAnimation</span> <span class="err">@</span><span class="nx">spriteSheet</span>
+    <span class="err">@</span><span class="nx">assetAnimation</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="err">@</span><span class="nx">width</span>
+    <span class="err">@</span><span class="nx">stage</span><span class="p">.</span><span class="nx">addChild</span> <span class="err">@</span><span class="nx">assetAnimation</span>
+
+    <span class="k">if</span> <span class="err">@</span><span class="nx">autostart</span>
+      <span class="err">@</span><span class="nx">assetAnimation</span><span class="p">.</span><span class="nx">play</span><span class="p">()</span>
+    <span class="k">else</span>
+      <span class="err">@</span><span class="nx">assetAnimation</span><span class="p">.</span><span class="nx">gotoAndStop</span><span class="p">(</span><span class="err">@</span><span class="nx">assetAnimation</span><span class="p">.</span><span class="nx">spriteSheet</span><span class="p">.</span><span class="nx">_numFrames</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="err">@</span><span class="nx">assetAnimation</span><span class="p">.</span><span class="nx">onAnimationEnd</span> <span class="o">=</span> <span class="o">=&gt;</span>
+      <span class="err">@</span><span class="nx">assetAnimation</span><span class="p">.</span><span class="nx">gotoAndStop</span><span class="p">(</span><span class="err">@</span><span class="nx">assetAnimation</span><span class="p">.</span><span class="nx">spriteSheet</span><span class="p">.</span><span class="nx">_numFrames</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="err">@</span><span class="nx">rollover</span>
+      <span class="nx">el</span> <span class="o">=</span> <span class="err">@</span><span class="nx">canvas</span>
+      <span class="nx">el</span> <span class="o">=</span> <span class="err">@</span><span class="nx">asset</span><span class="p">.</span><span class="nx">closest</span><span class="p">(</span><span class="nx">$</span> <span class="err">@</span><span class="nx">trigger</span><span class="p">)</span> <span class="k">if</span> <span class="err">@</span><span class="nx">trigger</span>
+
+      <span class="nx">el</span><span class="p">.</span><span class="nx">mouseenter</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="err">@</span><span class="nx">assetAnimation</span><span class="p">.</span><span class="nx">gotoAndPlay</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nb">window</span><span class="p">.</span><span class="nx">initializeSpriteAnimations</span> <span class="o">=</span> <span class="o">=&gt;</span>
+  <span class="k">if</span> <span class="nx">Modernizr</span><span class="p">.</span><span class="nx">canvas</span>
+    <span class="nx">Ticker</span><span class="p">.</span><span class="nx">setFPS</span> <span class="mi">30</span>
+    <span class="k">new</span> <span class="nx">SpriteAnimations</span> <span class="p">(</span><span class="nx">$</span> <span class="nx">asset</span><span class="p">)</span> <span class="k">for</span> <span class="nx">asset</span> <span class="k">in</span> <span class="p">(</span><span class="nx">$</span> <span class="s2">&quot;[data-animate=&#39;true&#39;]&quot;</span><span class="p">)</span>
+
+
+
+<span class="p">(</span><span class="nx">$</span> <span class="nb">document</span><span class="p">).</span><span class="nx">ready</span> <span class="o">-&gt;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">initializeSpriteAnimations</span><span class="p">()</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>support for Rails Turbo links</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">bind</span> <span class="s1">&#39;page:change&#39;</span><span class="p">,</span> <span class="o">-&gt;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">initializeSpriteAnimations</span><span class="p">()</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
